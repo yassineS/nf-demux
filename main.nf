@@ -5,7 +5,7 @@
 ========================================================================================
  nf-core/bcldemux Analysis Pipeline.
  #### Homepage / Documentation
- https://github.com/nf-core/bcldemux
+ https://github.com/yassineS/nf-demux
 ----------------------------------------------------------------------------------------
 */
 
@@ -18,19 +18,17 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run nf-core/bcldemux --reads '*_R{1,2}.fastq.gz' -profile docker
+    nextflow run nf-core/bcldemux --lanes lanes.tsv --sampleSheet SampleSheet.csv -profile docker
 
     Mandatory arguments:
-      --reads                       Path to input data (must be surrounded with quotes)
+      --reads                       Path to input data (must be surrounded with quotes).
+      --sampleSheet                 SampleSheet containing instructions on how to run bcl2fastq, the
+                                    file contains also the .
       -profile                      Configuration profile to use. Can use multiple (comma separated)
                                     Available: conda, docker, singularity, awsbatch, test and more.
 
     Options:
-      --genome                      Name of iGenomes reference
-      --singleEnd                   Specifies that the input is single end reads
-
-    References                      If not specified in the configuration file or you wish to overwrite any of the references.
-      --fasta                       Path to Fasta reference
+      --revComp                      Name of iGenomes reference
 
     Other options:
       --outdir                      The output directory where the results will be saved
@@ -54,22 +52,6 @@ if (params.help) {
 /*
  * SET UP CONFIGURATION VARIABLES
  */
-
-// Check if genome exists in the config file
-if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
-    exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
-}
-
-// TODO nf-core: Add any reference files that are needed
-// Configurable reference genomes
-//
-// NOTE - THIS IS NOT USED IN THIS PIPELINE, EXAMPLE ONLY
-// If you want to use the channel below in a process, define the following:
-//   input:
-//   file fasta from ch_fasta
-//
-params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
-if (params.fasta) { ch_fasta = file(params.fasta, checkIfExists: true) }
 
 // Has the run name been specified by the user?
 //  this has the bonus effect of catching both -name and --name
